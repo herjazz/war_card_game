@@ -1,4 +1,6 @@
+# TODO: when down to 2 players the game often doesn't seem to finish
 import random
+import sys
 import playing_cards as pc
 
 war_scores = {
@@ -17,84 +19,122 @@ war_scores = {
     "A": 14
 }
 
-deck = pc.create_deck()
 
-random.shuffle(deck)
-
-num_players = 2
-
-hand_size = len(deck) // num_players
-
-hand_one = deck[:hand_size]
-hand_two = deck[hand_size:]
-
-discard_one = []
-discard_two = []
-
-def play_hand(h1, h2):
-    # play hand
-    p1 = h1.pop()
-    p2 = h2.pop()
-    # Add to discard piles
-    discard_one.append(p1)
-    discard_two.append(p2)
-    # Show cards
-    print("Player one's card is:", p1)
-    print("Player two's card is:", p2)
-    return p1, p2
+class Player:
     
+    def __init__(self, name, deck=None):
+        self.name = name
+        if not deck:
+            self.deck = []
+        else:
+            self.deck = deck
+        self.discarded = []
 
-def ordinary_win(winner) -> None:
-    """ Add stack cards to bottom of winner's pile -assumes 2 players """
-    winner.insert(0, discard_one.pop())
-    winner.insert(0, discard_two.pop())
+    def play_hand(self):
+        played_card = self.deck.pop()
+        self.discarded.append(played_card)
+        print(f"{self.name}'s card is {played_card}.")
+        return played_card
+    
+    def add_cards(self, cards):
+        self.deck = cards + self.deck
+
+    def empty_deck(self):
+        return not self.deck
+
+    def __str__(self):
+        return f'{self.name} has {len(self.deck)} card(s) left.'
+
+    def __repr__(self):
+        return f'Player({self.name}, {self.deck})'
 
 
-def print_deck_sizes() -> None:
-    """ Print deck sizes """
-    print(f"Player 1 has {len(hand_one)} card(s) left.")
-    print(f"Player 2 has {len(hand_two)} card(s) left.")
+def choose_num_players() -> int:
+    attempts = 0
+    while attempts < 5:
+        num_players = input("How many players? (Choose 2, 3, or 4): ")
+        if num_players in ("2", "3", "4"):
+            print(f"You have chosen {num_players} players.")
+            return int(num_players)
+        attempts += 1
+        print("Invalid input, try again.")
+    sys.exit("Too many failed attempts. Exiting.")
 
 
-while hand_one and hand_two:
-    # Check values
-    p1, p2 = play_hand(hand_one, hand_two)
-    if war_scores[p1.rank] > war_scores[p2.rank]:
-        print("Player 1 wins the hand!")
-        ordinary_win(hand_one)
-        print_deck_sizes()
-    elif war_scores[p1.rank] < war_scores[p2.rank]:
-        print("Player 2 wins the hand!")
-        ordinary_win(hand_two)
-        print_deck_sizes()
-    else:
-        if len(hand_one) == 1:
-            hand_one.pop()
-            print("Player 1 is out of cards!")
-            break
-        if len(hand_two) == 1:
-            hand_two.pop()
-            print("Player 2 is out of cards!")
-            break
-        print("WAR!!!")
-        undecided = True
-        while undecided:
-            discard_one.append(hand_one.pop())
-            discard_two.append(hand_two.pop())
-            next1, next2 = play_hand(hand_one, hand_two)
-            if war_scores[next1.rank] > war_scores[next2.rank]:
-                hand_one = discard_one + discard_two + hand_one 
-                print("Player 1 gets the loot!")
-                undecided = False
-            elif war_scores[next1.rank] < war_scores[next2.rank]:
-                hand_two = discard_one + discard_two + hand_two
-                print("Player 2 gets the loot!")
-                undecided = False
-            print_deck_sizes()
-        discard_one = []
-        discard_two = []
+def create_players(deck, num_players: int) -> list[Player]:
+    """ Create a list of players with decks """
+    random.shuffle(deck)
+    deck_size: int = len(deck) // num_players
+    decks = (deck[i:i + deck_size] for i in range(0, len(deck), deck_size))
+    return [Player(f'Player {n + 1}', next(decks)) for n in range(num_players)]
 
-if hand_one and not hand_two:
-    print("Player 1 wins the game")
-elif hand_two and not hand_one:
-    print("Player 2 wins the game")
+
+def num_winners(scores: list[int], top_score: int) -> int:
+    return sum(1 for v in scores.values() if v == top_score)
+
+
+def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
+    winnings: list[pc.Card] = []
+    winner: Player = max(scores_dict, key=scores_dict.get)
+    print(f"{winner.name} wins the hand!")
+    for player in scores_dict.keys():
+        if war:
+            winnings += player.discarded
+            player.discarded = []
+        else:
+            winnings.append(player.discarded.pop())
+    winner.add_cards(winnings)
+
+
+def main():
+    players: list[Player] = create_players(pc.create_deck(), choose_num_players())
+    round_scores: dict[Player, int] = {}
+
+    while True:
+        for player in players:
+            card = player.play_hand()
+            round_scores[player] = war_scores[card.rank]
+        max_score = max(round_scores.values())
+        war_play: bool = False
+        # Play war
+        while num_winners(round_scores, max_score) > 1:
+            war_play = True
+            print("WAR!")
+            remaining_players = []
+            for pl, score in round_scores.items():
+                if score == max_score:
+                    remaining_players.append(pl)
+                else:
+                    # To ensure "loser" doesn't have highest score if war cards end up lower
+                    round_scores[pl] = 0
+            for player in remaining_players:
+                if len(player.deck) == 1:
+                    card = player.deck.pop()
+                else:
+                    player.discarded.append(player.deck.pop())
+                    card = player.play_hand()
+                round_scores[player] = war_scores[card.rank]
+        if war_play:
+            check_winner(round_scores, war=True)
+        else:
+            check_winner(round_scores)
+        survivors = []
+        for player in players:
+            if player.deck:
+                survivors.append(player)
+                print(player)
+            else:
+                # Remove any players whose decks are empty
+                print(f"Goodbye to {player.name}")
+                del round_scores[player]
+        if len(survivors) == 1:
+            print("GAME OVER!")
+            print(f"{survivors[0].name} is the winner!")
+            sys.exit()
+        else:
+            players = survivors
+            input("press any key to proceed")
+
+
+if __name__ == "__main__":
+    main()
