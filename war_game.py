@@ -85,8 +85,9 @@ def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
 def main():
     players: list[Player] = create_players(pc.create_deck(), choose_num_players())
     round_scores: dict[Player, int] = {}
+    num_rounds = 0
 
-    while True:
+    while num_rounds < 10:
         for player in players:
             card = player.play_hand()
             round_scores[player] = war_scores[card.rank]
@@ -130,7 +131,28 @@ def main():
         else:
             players = survivors
             input("press any key to proceed")
+        num_rounds += 1
 
+    # Find player with largest deck
+    largest_deck_size = max([len(pl.deck) for pl in players])
+    biggest_decks = [pl for pl in players if len(pl.deck) == largest_deck_size]
+    print("Maximum number of rounds exceeded!")
+    if len(biggest_decks) == 1:
+        print(f"{biggest_decks[0].name} has the most cards - they are the winner!")
+    else:
+        # Tiebreak
+        # TODO: deal with a 3-way tiebreak
+        print(f"TIEBREAK!!! between {biggest_decks[0].name} and {biggest_decks[1].name}!")
+        cards = []
+        for pl in biggest_decks:
+            card = pl.play_hand()
+            cards.append(war_scores[card.rank])
+        if len(set(cards)) == 1:
+            # TODO: Add code to deal with same cards
+            print("Try again")
+        else:
+            winner = cards.index(max(cards))
+            print(f"{biggest_decks[winner].name} wins via tiebreak!")
 
 if __name__ == "__main__":
     main()
