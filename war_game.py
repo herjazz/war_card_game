@@ -16,12 +16,11 @@ war_scores = {
     "J": 11,
     "Q": 12,
     "K": 13,
-    "A": 14
+    "A": 14,
 }
 
 
 class Player:
-    
     def __init__(self, name, deck=None):
         self.name = name
         if not deck:
@@ -35,15 +34,15 @@ class Player:
         self.discarded.append(played_card)
         print(f"{self.name}'s card is {played_card}.")
         return played_card
-    
+
     def add_cards(self, cards):
         self.deck = cards + self.deck
 
     def __str__(self):
-        return f'{self.name} has {len(self.deck)} card(s) left.'
+        return f"{self.name} has {len(self.deck)} card(s) left."
 
     def __repr__(self):
-        return f'Player({self.name}, {self.deck})'
+        return f"Player({self.name}, {self.deck})"
 
 
 def choose_num_players() -> int:
@@ -59,11 +58,11 @@ def choose_num_players() -> int:
 
 
 def create_players(deck, num_players: int) -> list[Player]:
-    """ Create a list of players with decks """
+    """Create a list of players with decks"""
     random.shuffle(deck)
     deck_size: int = len(deck) // num_players
-    decks = (deck[i:i + deck_size] for i in range(0, len(deck), deck_size))
-    return [Player(f'Player {n + 1}', next(decks)) for n in range(num_players)]
+    decks = (deck[i : i + deck_size] for i in range(0, len(deck), deck_size))
+    return [Player(f"Player {n + 1}", next(decks)) for n in range(num_players)]
 
 
 def num_winners(scores: list[int], top_score: int) -> int:
