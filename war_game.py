@@ -39,9 +39,6 @@ class Player:
     def add_cards(self, cards):
         self.deck = cards + self.deck
 
-    def empty_deck(self):
-        return not self.deck
-
     def __str__(self):
         return f'{self.name} has {len(self.deck)} card(s) left.'
 
