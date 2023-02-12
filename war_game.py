@@ -21,7 +21,24 @@ war_scores = {
 
 
 class Player:
-    def __init__(self, name, deck=None):
+    """
+    Represents a card player of game of war
+
+    Attributes:
+        name (str): name of player
+        deck (list[pc.Card]): deck of cards -> class Card from playing_cards
+        discarded (list[none]): empty list for discarded cards
+    """
+
+    def __init__(self, name: str, deck: list[pc.Card] = None):
+        """
+        Initializes class attributes
+
+        Args:
+           name (str): name of player
+           deck (list[pc.Card]): deck of cards
+        """
+
         self.name = name
         if not deck:
             self.deck = []
@@ -30,23 +47,44 @@ class Player:
         self.discarded = []
 
     def play_hand(self):
+        """
+        Represents a turn by a  player of game of war.
+        one card is popped from self.deck and added to
+        self.discarded,
+
+        Returns:
+            played_card (pc.Card)
+        """
+
         played_card = self.deck.pop()
         self.discarded.append(played_card)
         print(f"{self.name}'s card is {played_card}.")
         return played_card
 
-    def add_cards(self, cards):
+    def add_cards(self, cards: list[pc.Card]):
+        """
+        Adds cards to start of deck
+        
+        Args:
+            cards (list[pc.Card]): list of cards to add
+        """
+        
         self.deck = cards + self.deck
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """ Prints number of cards left in self.deck """
         return f"{self.name} has {len(self.deck)} card(s) left."
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Represents an instance of Player with name and contents of deck
+        """
         return f"Player({self.name}, {self.deck})"
 
 
 def choose_num_players() -> int:
-    attempts = 0
+    """ Function to choose number of players; exits after 5 failed attempts """
+    attempts: int = 0
     while attempts < 5:
         num_players = input("How many players? (Choose 2, 3, or 4): ")
         if num_players in ("2", "3", "4"):
@@ -58,7 +96,7 @@ def choose_num_players() -> int:
 
 
 def create_players(deck, num_players: int) -> list[Player]:
-    """Create a list of players with decks"""
+    """ Create a list of players with decks """
     random.shuffle(deck)
     deck_size: int = len(deck) // num_players
     decks = (deck[i : i + deck_size] for i in range(0, len(deck), deck_size))
@@ -66,10 +104,12 @@ def create_players(deck, num_players: int) -> list[Player]:
 
 
 def num_winners(scores: list[int], top_score: int) -> int:
+    """ Return the number of values that match a top score """
     return sum(1 for v in scores.values() if v == top_score)
 
 
 def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
+    """ Print name of winner and update their deck with won cards """
     winnings: list[pc.Card] = []
     winner: Player = max(scores_dict, key=scores_dict.get)
     print(f"{winner.name} wins the hand!")
@@ -85,13 +125,13 @@ def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
 def main():
     players: list[Player] = create_players(pc.create_deck(), choose_num_players())
     round_scores: dict[Player, int] = {}
-    num_rounds = 0
+    num_rounds: int = 0
 
     while num_rounds < 10:
         for player in players:
             card = player.play_hand()
             round_scores[player] = war_scores[card.rank]
-        max_score = max(round_scores.values())
+        max_score: int = max(round_scores.values())
         war_play: bool = False
         # Play war
         while num_winners(round_scores, max_score) > 1:
@@ -115,7 +155,7 @@ def main():
             check_winner(round_scores, war=True)
         else:
             check_winner(round_scores)
-        survivors = []
+        survivors: list[Player] = []
         for player in players:
             if player.deck:
                 survivors.append(player)
