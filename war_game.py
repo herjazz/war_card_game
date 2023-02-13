@@ -1,4 +1,6 @@
 # TODO: when down to 2 players the game often doesn't seem to finish
+# TODO: split Player class into a generic player class (move to playing_cards)
+#       and a war player subclass
 import random
 import sys
 import playing_cards as pc
