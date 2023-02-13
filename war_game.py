@@ -3,6 +3,7 @@ import random
 import sys
 import playing_cards as pc
 
+# Card points - Aces high
 war_scores = {
     "2": 2,
     "3": 3,
@@ -47,9 +48,9 @@ class Player:
             self.deck = deck
         self.discarded = []
 
-    def play_hand(self):
+    def play_hand(self) -> pc.Card:
         """
-        Represents a turn by a  player of game of war.
+        Represents a turn by a player of game of war.
         one card is popped from self.deck and added to
         self.discarded,
 
@@ -64,7 +65,7 @@ class Player:
 
     def add_cards(self, cards: list[pc.Card]):
         """
-        Adds cards to start of deck
+        Adds cards to "bottom" of deck
 
         Args:
             cards (list[pc.Card]): list of cards to add
@@ -112,14 +113,14 @@ def num_winners(scores: list[int], top_score: int) -> int:
 def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
     """Print name of winner and update their deck with won cards"""
     winnings: list[pc.Card] = []
-    winner: Player = max(scores_dict, key=scores_dict.get)
-    print(f"{winner.name} wins the hand!")
     for player in scores_dict.keys():
         if war:
             winnings += player.discarded
             player.discarded = []
         else:
             winnings.append(player.discarded.pop())
+    winner: Player = max(scores_dict, key=scores_dict.get)
+    print(f"{winner.name} wins the hand!")
     winner.add_cards(winnings)
 
 
@@ -180,6 +181,7 @@ def main():
         pl for pl in players if len(pl.deck) == largest_deck_size
     ]
     print("Maximum number of rounds exceeded!")
+    print("The winner will be the player with the most cards.")
     if len(biggest_decks) == 1:
         print(f"{biggest_decks[0].name} has the most cards - they are the winner!")
     else:
