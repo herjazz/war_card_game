@@ -23,7 +23,7 @@ war_scores = {
 }
 
 
-class Player:
+class WarPlayer(pc.CardPlayer):
     """
     Represents a card player of game of war
 
@@ -43,11 +43,7 @@ class Player:
            discarded (list[pc.Card]): empty list for discarded cards
         """
 
-        self.name = name
-        if not deck:
-            self.deck = []
-        else:
-            self.deck = deck
+        super().__init__(name, deck)
         self.discarded = []
 
     def play_hand(self) -> pc.Card:
@@ -79,11 +75,68 @@ class Player:
         """Prints number of cards left in self.deck"""
         return f"{self.name} has {len(self.deck)} card(s) left."
 
-    def __repr__(self) -> str:
-        """
-        Represents an instance of Player with name and contents of deck
-        """
-        return f"Player({self.name}, {self.deck})"
+
+# class Player:
+#     """
+#     Represents a card player of game of war
+
+#     Attributes:
+#         name (str): name of player
+#         deck (list[pc.Card]): deck of cards -> class Card from playing_cards
+#         discarded (list[pc.Card]): empty list for discarded cards
+#     """
+
+#     def __init__(self, name: str, deck: list[pc.Card] = None):
+#         """
+#         Initializes class attributes
+
+#         Args:
+#            name (str): name of player
+#            deck (list[pc.Card]): deck of cards
+#            discarded (list[pc.Card]): empty list for discarded cards
+#         """
+
+#         self.name = name
+#         if not deck:
+#             self.deck = []
+#         else:
+#             self.deck = deck
+#         self.discarded = []
+
+#     def play_hand(self) -> pc.Card:
+#         """
+#         Represents a turn by a player of game of war.
+#         one card is popped from self.deck and added to
+#         self.discarded,
+
+#         Returns:
+#             played_card (pc.Card)
+#         """
+
+#         played_card = self.deck.pop()
+#         self.discarded.append(played_card)
+#         print(f"{self.name}'s card is {played_card}.")
+#         return played_card
+
+#     def add_cards(self, cards: list[pc.Card]):
+#         """
+#         Adds cards to "bottom" of deck
+
+#         Args:
+#             cards (list[pc.Card]): list of cards to add
+#         """
+
+#         self.deck = cards + self.deck
+
+#     def __str__(self) -> str:
+#         """Prints number of cards left in self.deck"""
+#         return f"{self.name} has {len(self.deck)} card(s) left."
+
+#     def __repr__(self) -> str:
+#         """
+#         Represents an instance of Player with name and contents of deck
+#         """
+#         return f"Player({self.name}, {self.deck})"
 
 
 def choose_num_players() -> int:
@@ -99,12 +152,12 @@ def choose_num_players() -> int:
     sys.exit("Too many failed attempts. Exiting.")
 
 
-def create_players(deck: list[pc.Card], num_players: int) -> list[Player]:
+def create_players(deck: list[pc.Card], num_players: int) -> list[WarPlayer]:
     """Create a list of players with decks"""
     random.shuffle(deck)
     deck_size: int = len(deck) // num_players
     decks = (deck[i : i + deck_size] for i in range(0, len(deck), deck_size))
-    return [Player(f"Player {n + 1}", next(decks)) for n in range(num_players)]
+    return [WarPlayer(f"Player {n + 1}", next(decks)) for n in range(num_players)]
 
 
 def num_winners(scores: list[int], top_score: int) -> int:
@@ -112,7 +165,7 @@ def num_winners(scores: list[int], top_score: int) -> int:
     return sum(1 for v in scores.values() if v == top_score)
 
 
-def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
+def check_winner(scores_dict: dict[WarPlayer, int], war: bool = False) -> None:
     """Print name of winner and update their deck with won cards"""
     winnings: list[pc.Card] = []
     for player in scores_dict.keys():
@@ -121,14 +174,14 @@ def check_winner(scores_dict: dict[Player, int], war: bool = False) -> None:
             player.discarded = []
         else:
             winnings.append(player.discarded.pop())
-    winner: Player = max(scores_dict, key=scores_dict.get)
+    winner: WarPlayer = max(scores_dict, key=scores_dict.get)
     print(f"{winner.name} wins the hand!")
     winner.add_cards(winnings)
 
 
 def main():
-    players: list[Player] = create_players(pc.create_deck(), choose_num_players())
-    round_scores: dict[Player, int] = {}
+    players: list[WarPlayer] = create_players(pc.create_deck(), choose_num_players())
+    round_scores: dict[WarPlayer, int] = {}
     num_rounds: int = 0
 
     while num_rounds < 10:
@@ -141,7 +194,7 @@ def main():
         while num_winners(round_scores, max_score) > 1:
             war_play = True
             print("WAR!")
-            remaining_players: list[Player] = []
+            remaining_players: list[WarPlayer] = []
             for pl, score in round_scores.items():
                 if score == max_score:
                     remaining_players.append(pl)
@@ -159,7 +212,7 @@ def main():
             check_winner(round_scores, war=True)
         else:
             check_winner(round_scores)
-        survivors: list[Player] = []
+        survivors: list[WarPlayer] = []
         for player in players:
             if player.deck:
                 survivors.append(player)
@@ -179,7 +232,7 @@ def main():
 
     # Find player with largest deck
     largest_deck_size: int = max([len(pl.deck) for pl in players])
-    biggest_decks: list[Player] = [
+    biggest_decks: list[WarPlayer] = [
         pl for pl in players if len(pl.deck) == largest_deck_size
     ]
     print("Maximum number of rounds exceeded!")

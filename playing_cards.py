@@ -39,3 +39,34 @@ class Card:
 def create_deck() -> list[Card]:
     """ Creates an unshuffled standard deck of cards as a list """
     return [Card(rank, suit.value) for rank in ranks for suit in Suit]
+
+
+class CardPlayer:
+    """
+    Represents a generic card player
+
+    Attributes:
+        name (str): name of player
+        deck (list[Card]): deck of cards -> class Card
+    """
+
+    def __init__(self, name: str, deck: list[Card] = None):
+        """
+        Initializes class attributes
+
+        Args:
+           name (str): name of player
+           deck (list[Card]): deck of cards
+        """
+
+        self.name = name
+        if not deck:
+            self.deck = []
+        else:
+            self.deck = deck
+
+    def __repr__(self) -> str:
+        """
+        Represents an instance of Player with name and contents of deck
+        """
+        return f"Player({self.name}, {self.deck})"
