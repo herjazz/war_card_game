@@ -1,8 +1,11 @@
+# TODO: Add tests?
 # playing_cards.py
 
-import enum 
+import enum
 
 ranks = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
+
+
 class Suit(enum.Enum):
     SPADES = chr(9824)
     HEARTS = chr(9829)
@@ -11,7 +14,6 @@ class Suit(enum.Enum):
 
 
 class Card:
-
     """
     Card represents a single playing card
 
@@ -33,11 +35,12 @@ class Card:
         self.suit = suit
 
     def __repr__(self) -> str:
-        """ Represents an instance of Card with rank then suit """
-        return f'{self.rank} of {self.suit}'
+        """Represents an instance of Card with rank then suit"""
+        return f"{self.rank} of {self.suit}"
+
 
 def create_deck() -> list[Card]:
-    """ Creates an unshuffled standard deck of cards as a list """
+    """Creates an unshuffled standard deck of cards as a list"""
     return [Card(rank, suit.value) for rank in ranks for suit in Suit]
 
 
