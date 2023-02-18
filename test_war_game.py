@@ -27,6 +27,12 @@ class TestWarPlayer(unittest.TestCase):
         self.player.add_cards(self.cards)
         self.assertEqual(self.cards, self.player.deck[:5])
 
+    def test_add_cards_empty(self):
+        """ Check card gets added to discard pile """
+        previous_length = len(self.player.deck)
+        self.player.add_cards([])
+        self.assertEqual(previous_length, len(self.player.deck))
+
 
 if __name__  == '__main__':
     unittest.main()
