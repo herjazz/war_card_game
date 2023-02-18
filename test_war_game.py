@@ -20,7 +20,7 @@ class TestWarPlayer(unittest.TestCase):
     def test_play_hand_discarded(self):
         """ Check card gets added to discard pile """
         card = self.player.play_hand()
-        self.assertIn(card, self.player.discarded)
+        self.assertEqual(card, self.player.discarded[-1])
 
     def test_add_cards(self):
         """ Check card gets added to discard pile """
