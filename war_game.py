@@ -1,5 +1,4 @@
 # TODO: when down to 2 players the game often doesn't seem to finish
-# TODO: Add tests
 # TODO: Break down main() into functions
 import random
 import sys
@@ -44,7 +43,7 @@ class WarPlayer(pc.CardPlayer):
         """
 
         super().__init__(name, deck)
-        self.discarded = []
+        self.discarded: list[pc.Card] = []
 
     def play_hand(self) -> pc.Card:
         """
@@ -61,7 +60,7 @@ class WarPlayer(pc.CardPlayer):
         print(f"{self.name}'s card is {played_card}.")
         return played_card
 
-    def add_cards(self, cards: list[pc.Card]):
+    def add_cards(self, cards: list[pc.Card]) -> None:
         """
         Adds cards to "bottom" of deck
 
@@ -74,69 +73,6 @@ class WarPlayer(pc.CardPlayer):
     def __str__(self) -> str:
         """Prints number of cards left in self.deck"""
         return f"{self.name} has {len(self.deck)} card(s) left."
-
-
-# class Player:
-#     """
-#     Represents a card player of game of war
-
-#     Attributes:
-#         name (str): name of player
-#         deck (list[pc.Card]): deck of cards -> class Card from playing_cards
-#         discarded (list[pc.Card]): empty list for discarded cards
-#     """
-
-#     def __init__(self, name: str, deck: list[pc.Card] = None):
-#         """
-#         Initializes class attributes
-
-#         Args:
-#            name (str): name of player
-#            deck (list[pc.Card]): deck of cards
-#            discarded (list[pc.Card]): empty list for discarded cards
-#         """
-
-#         self.name = name
-#         if not deck:
-#             self.deck = []
-#         else:
-#             self.deck = deck
-#         self.discarded = []
-
-#     def play_hand(self) -> pc.Card:
-#         """
-#         Represents a turn by a player of game of war.
-#         one card is popped from self.deck and added to
-#         self.discarded,
-
-#         Returns:
-#             played_card (pc.Card)
-#         """
-
-#         played_card = self.deck.pop()
-#         self.discarded.append(played_card)
-#         print(f"{self.name}'s card is {played_card}.")
-#         return played_card
-
-#     def add_cards(self, cards: list[pc.Card]):
-#         """
-#         Adds cards to "bottom" of deck
-
-#         Args:
-#             cards (list[pc.Card]): list of cards to add
-#         """
-
-#         self.deck = cards + self.deck
-
-#     def __str__(self) -> str:
-#         """Prints number of cards left in self.deck"""
-#         return f"{self.name} has {len(self.deck)} card(s) left."
-
-#     def __repr__(self) -> str:
-#         """
-#         Represents an instance of Player with name and contents of deck
-#         """
-#         return f"Player({self.name}, {self.deck})"
 
 
 def choose_num_players() -> int:
