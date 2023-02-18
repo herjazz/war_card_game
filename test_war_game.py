@@ -11,6 +11,12 @@ class TestWarPlayer(unittest.TestCase):
         self.cards = deck[5:10]
         self.player = WarPlayer('Test Player', deck)
 
+    def test_play_hand_card(self):
+        """ Check card popped is 'top card' in deck """
+        top_card = self.player.deck[-1]
+        card = self.player.play_hand()
+        self.assertEqual(card, top_card)
+
     def test_play_hand_discarded(self):
         """ Check card gets added to discard pile """
         card = self.player.play_hand()
