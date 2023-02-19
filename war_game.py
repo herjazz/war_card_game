@@ -1,5 +1,5 @@
 # TODO: when down to 2 players the game often doesn't seem to finish
-# TODO: Break down main() into functions
+# TODO: Break down main() into functions OR make a WarGame class
 import random
 import sys
 import playing_cards as pc
